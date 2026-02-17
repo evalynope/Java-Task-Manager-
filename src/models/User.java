@@ -6,7 +6,7 @@ public class User {
     private int id;
     private String username;
     private String email;
-    private String pw;
+    private String password;
     private ArrayList<Project> projects;
 //    private int nextProjectId = 1;
 
@@ -15,7 +15,7 @@ public class User {
         this.id = id;
         this.username = username;
         this.email = email;
-        this.pw = pw;
+        this.password = password;
         this.projects = new ArrayList<>();
     }
 
@@ -24,7 +24,7 @@ public class User {
     public int getId() { return id; }
     public String getUsername() { return username; }
     public String getEmail() { return email; }
-    public String getPw() { return pw; }
+    public String getPw() { return password; }
     public ArrayList<Project> getProjects() { return projects; }
 
     //more//
@@ -47,7 +47,7 @@ public class User {
 
 
     public boolean checkPassword(String inputPw) {
-        return pw.equals(inputPw);
+        return password.equals(inputPw);
     }
 
     @Override

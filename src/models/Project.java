@@ -13,18 +13,18 @@ public class Project {
         this.id = id;
         this.name = name;
         this.ownerId = ownerId;
-        this.tasks = new ArrayList<>();
+//        this.tasks = new ArrayList<>();
 
     }
 
-    public void addTask(Task task){
-        tasks.add(task);
-    }
+//    public void addTask(Task task){
+//        tasks.add(task);
+//    }
 
     public int getId() { return id; }
     public String getName() { return name; }
     public int getOwnerId() { return ownerId; }
-    public ArrayList<Task> getTasks() { return tasks; }
+//    public ArrayList<Task> getTasks() { return tasks; }
 
 
     @Override
