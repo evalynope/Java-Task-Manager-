@@ -2,6 +2,8 @@ import models.Task;
 import services.TaskManager;
 import services.UserManager;
 import models.User;
+import models.Project;
+import services.ProjectManager;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,52 +21,24 @@ public class MainTest {
         try (Connection conn = DriverManager.getConnection(url, user, password)) {
             System.out.println("Connected to database!");
 
-            // 2️⃣ Service layers
+
+            // Assume you already have a Connection and a user
             UserManager userManager = new UserManager(conn);
-            TaskManager taskManager = new TaskManager(conn);
+            ProjectManager projectManager = new ProjectManager(conn);
 
-            // 3️⃣ Create a unique username
-            String uniqueUsername = "user" + System.currentTimeMillis();
-            User newUser = userManager.registerUser(uniqueUsername, uniqueUsername + "@exddda.com", "d123");
-            System.out.println("Registered user: " + newUser.getUsername() + " (id=" + newUser.getId() + ")");
+            // Register a test user
+            User user1 = userManager.registerUser("testuser_pm", "pm@example.com", "password123");
 
-            // 4️⃣ Create a project for the user (assume projects table exists)
-            int projectId = 1; // replace with real project ID or create a method to insert a project
-            System.out.println("Using project ID: " + projectId);
+           // Create a project for this user
+            Project project = projectManager.createProject(user1.getId(), "Test Project A");
 
-            // 5️⃣ Add tasks
-            Task t1 = taskManager.addTask(projectId, "Task A", "Do something important");
-            Task t2 = taskManager.addTask(projectId, "Task B", "Do something else");
-            System.out.println("Added tasks:");
-            System.out.println(t1);
-            System.out.println(t2);
+            System.out.println("Created project: " + project.getName() + " (id=" + project.getId() + ")");
 
-            // 6️⃣ List all tasks
-            List<Task> allTasks = taskManager.getTasks(projectId, false);
-            System.out.println("\nAll tasks for project " + projectId + ":");
-            for (Task t : allTasks) {
-                System.out.println(t);
-            }
 
-            // 7️⃣ Mark one complete
-            taskManager.markComplete(projectId, "Task A");
-            System.out.println("\nAfter marking Task A complete:");
-            List<Task> pendingTasks = taskManager.getTasks(projectId, true);
-            for (Task t : pendingTasks) {
-                System.out.println(t);
-            }
-
-            // 8️⃣ Remove Task B
-            taskManager.removeTask(projectId, "Task B");
-            System.out.println("\nAfter removing Task B:");
-            allTasks = taskManager.getTasks(projectId, false);
-            for (Task t : allTasks) {
-                System.out.println(t);
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Database error:");
+            } catch (SQLException e) {
+            System.err.println("Error getting database connection: " + e.getMessage());
             e.printStackTrace();
+
         }
     }
 }

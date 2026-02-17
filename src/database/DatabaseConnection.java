@@ -8,16 +8,22 @@ public class DatabaseConnection {
     private static Connection conn = null; // single reusable connection
 
     // This is the method you call from MainTest or other classes
-    public static Connection getConnection() throws SQLException {
-        if (conn == null || conn.isClosed()) {
-            String url = "jdbc:postgresql://localhost:5432/postgres";
-            String user = "evalynbassett"; // your postgres username
-            String password = "";           // your Postgres.app password (blank if none)
+    public static Connection getConnection() {
+        try {
+            if (conn == null || conn.isClosed()) {
+                String url = "jdbc:postgresql://localhost:5432/postgres";
+                String user = "evalynbassett";
+                String password = "";
 
-            conn = DriverManager.getConnection(url, user, password);
+                conn = DriverManager.getConnection(url, user, password);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting database connection: " + e.getMessage());
+            e.printStackTrace();
         }
         return conn;
     }
+
 
     // Optional main for testing the connection
     public static void main(String[] args) {

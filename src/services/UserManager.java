@@ -15,7 +15,7 @@ public class UserManager {
     }
 
     // register
-    public User registerUser(String username, String email, String password) throws SQLException {
+    public User registerUser(String username, String email, String password) {
 
         String sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?) RETURNING id";
 
@@ -30,8 +30,12 @@ public class UserManager {
                     id = rs.getInt("id");
                 }
                 return new User(id, username, email, password);
+                }
+            } catch (SQLException e) {
+            System.err.println("Error registering user: " + e.getMessage());
+            e.printStackTrace();
+            return null;
             }
-        }
     }
 
 
