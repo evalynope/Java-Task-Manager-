@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
 
-    private static Connection conn = null; // single reusable connection
+    static Connection conn = null; // single reusable connection
 
     // This is the method you call from MainTest or other classes
     public static Connection getConnection() {

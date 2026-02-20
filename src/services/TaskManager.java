@@ -1,114 +1,98 @@
 package services;
-import models.Task;
-import models.Project;
-import java.sql.*;
+import models.*;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import database.*;
 import java.util.ArrayList;
 import java.util.List;
 
 
+//private Connection conn; //this line breaks the file - turns into compact.
+
+
 public class TaskManager {
-
-    private Connection conn;
-
-    public TaskManager(Connection conn) {
-        this.conn = conn;
+    private TaskRepoOnly repository;
+    public TaskManager(TaskRepoOnly repository) {
+        this.repository = repository;
     }
-
-    //methods
 
     //add task
 
-    public Task addTask(int projectId, String title, String description) throws SQLException {
-        if (title == null || title.isBlank()) return null;
+    public Task addTask(int projectId, String title, String description) {
+        if (title == null || title.isBlank()) {
+            System.out.println("Task title cannot be empty.");
+            return null;
+        }
 
-        String sql = "INSERT INTO tasks( title, description, project_id, completed) VALUES (?, ?, ?, false) RETURNING id";
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, title);
-            stmt.setString(2, description);
-            stmt.setInt(3, projectId);
-
-
-
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                int id = 0;
-                if (rs.next()) id = rs.getInt("id");
-                return new Task(id, title, description, projectId);
-
-            }
+        try {
+            return repository.addTask(projectId, title, description);
+        } catch (Exception e) {
+            System.err.println("Error adding task: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         }
     }
 
-//list tasks in that project
-
-    public List<Task> getTasks(int project_id, boolean onlyPending) throws SQLException {
-
-        String sql = "SELECT * FROM tasks WHERE project_id = ?";
-        if (onlyPending) sql += " AND completed = false";
-
-        List<Task> tasks = new ArrayList<>();
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, project_id);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    tasks.add(new Task(
-                            rs.getInt("id"),
-                            rs.getString("title"),
-                            rs.getString("description"),
-//                            rs.getBoolean("completed"),
-                            rs.getInt("project_id")
-                    ));
-                }
-            }
+//    check if name is available
+    public boolean isTitleAvailable(int projectId, String title) {
+        try {
+            Task existingTask = repository.getTaskByTitle(projectId, title);
+            return existingTask == null; // true if available
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
         }
-        return tasks;
+        return false;
     }
 
-//mark complete/done
+    //get task by title
 
-    public boolean markComplete(int project_id, String title) throws SQLException {
-        String sql = "UPDATE tasks SET completed = true WHERE project_id = ? AND title = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, project_id);
-            stmt.setString(2, title);
-            int rows = stmt.executeUpdate();
-            return rows > 0; // true if at least one row updated
+    public Task getTaskByTitle(int projectId, String title) {
+        try {
+            return repository.getTaskByTitle(projectId, title);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error fetching tasks.");
+            return null;
         }
     }
 
-
-    // REMOVE TASK
-
-    public boolean removeTask(int project_id, String title) throws SQLException {
-        String sql = "DELETE FROM tasks WHERE project_id = ? AND title = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, project_id);
-            stmt.setString(2, title);
-            int rows = stmt.executeUpdate();
-            return rows > 0; // true if deleted
+    //list tasks
+    public List<Task> getTasks(int projectId, boolean completed) {
+        try {
+            return repository.getTasks(projectId, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error fetching tasks.");
+            return null;
         }
+    }
+
+//markcomplete
+
+    public boolean markComplete(int projectId, String title) {
+        try {
+            return repository.markComplete(projectId, title);
+        } catch (Exception e) {
+            System.err.println("Task could not be marked as complete.");
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
+ //removetasks
+
+    public boolean removeTask(int projectId, String title) {
+        try {
+            return repository.removeTask(projectId, title);
+        } catch (Exception e) {
+            System.err.println("Error removing task" + e.getMessage());
+            e.printStackTrace();
+            return false;
+
+        }
+
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//* Add a task
-//* List all tasks
-//* Mark a task as complete
-//* Remove a task
-//* Filter tasks (optional)

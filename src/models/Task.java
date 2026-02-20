@@ -6,14 +6,14 @@ public class Task {
     private String title;
     private String description;
     private boolean completed;
-    private int projectId; // new: links task to a project
+    private int projectId; // links task to a project
 
     // constructor
-    public Task(int id, String title, String description, int projectId) {
+    public Task(int id, String title, String description, boolean completed, int projectId) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.completed = completed;
+        this.completed = false;
         this.projectId = projectId;
     }
 
@@ -27,7 +27,7 @@ public class Task {
 
     //setters
 
-    public void setCompleted(boolean completed) { this.completed = completed; }
+    public void setCompleted(boolean completed) { this.completed = true; }
 
     //
 
