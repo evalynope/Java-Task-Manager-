@@ -21,40 +21,31 @@ public class ProjectManager {
         try {
             return repository.createProject(userId, name);
         } catch (SQLException e) {
-            System.err.println("Could not create project" + e.getMessage());
-            e.printStackTrace();
+
+            if ("23505".equals(e.getSQLState())) {  // unique violation
+                System.out.println("Project name already exists.");
+                return null;
+            }
+
+            System.out.println("Error creating project.");
             return null;
         }
     }
 
-    //check to see if it exists:
-
-//    public boolean isProjectNameAvailable(int userId, String name) {
-//        try {
-//            Project existingProject = repository.getProjectByName(userId, name);
-//            return existingProject == null; // true if available
-//        } catch (Exception ex) {
-//            System.out.println(ex.getMessage());
-//        }
-//        return false;
-//    }
-
     public boolean isProjectNameAvailable(int userId, String name) {
         try {
-            // Fetch all projects for the user
             List<Project> projects = getProjects(userId);
 
-            // Check if any project has exactly the same name (case-sensitive)
             for (Project p : projects) {
-                if (p.getName().equals(name)) { // equals is case-sensitive
-                    return false; // name already exists
+                if (p.getName().equals(name)) {
+                    return false;
                 }
             }
 
-            return true; // name is available
+            return true;
         } catch (Exception e) {
             System.err.println("Error checking project name availability: " + e.getMessage());
-            return false; // safe default: treat as unavailable if error occurs
+            return false;
         }
     }
 

@@ -156,8 +156,7 @@ public class TaskRepo {
                 return new Project(id, name, userId);
             }
         } catch (SQLException e) {
-            System.err.println("Error creating project" + e.getMessage());
-            e.printStackTrace();
+            System.out.println("Error creating project");
             return null;
 
         }

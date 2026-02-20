@@ -135,8 +135,7 @@ public class Main {
                         System.out.print("Project name: ");
                         String name = scanner.nextLine();
 
-
-
+//**************138
                         if (!projectManager.isProjectNameAvailable(currentUser.getId(), name)) {
                             System.out.println("Project name already exists! Please choose another one.");
 
