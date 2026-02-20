@@ -44,64 +44,75 @@ public class Main {
                 if (choice.isEmpty()) {
                     System.out.println("Please choose a valid option.");
                 } else if (choice.equals("r")) {
-                    System.out.println("Username: ");
-                    String username = scanner.nextLine();
-                    do {
-                        System.out.println("Username:");
-                        username = scanner.nextLine();
 
-                        if (username == null || username.isBlank()) {
+                    String username;
+                    while (true) {
+                        System.out.print("Username (case-sensitive): ");
+                        username = scanner.nextLine().trim();
+
+                        if (username.isBlank()) {
                             System.out.println("Username cannot be blank.");
                             continue;
                         }
 
                         if (userManager.findByUsername(username) != null) {
-                            System.out.println("Username is already taken - please choose another one.");
-                            username = null; // force loop to continue
+                            System.out.println("Username already taken.");
+                            continue;
                         }
 
-                    } while (username == null || username.isBlank());
+                        break; // valid username
+                    }
 
-                    String email = scanner.nextLine();
-                    do {
-                        System.out.println("Email:");
-                        email = scanner.nextLine();
+                    String email;
+                    while (true) {
+                        System.out.print("Email: ");
+                        email = scanner.nextLine().trim();
 
-                        if (email == null || email.isBlank()) {
+                        if (email.isBlank()) {
                             System.out.println("Email cannot be blank.");
+                            continue;
                         }
+                        break;
+                    }
 
-                    } while (email == null || email.isBlank());
+                    String password;
+                    while (true) {
+                        System.out.print("Password: ");
+                        password = scanner.nextLine().trim();
 
-                    String password = scanner.nextLine();
-                    do {
-                        System.out.println("Password:");
-                        password = scanner.nextLine();
-
-                        if (password == null || password.isBlank()) {
+                        if (password.isBlank()) {
                             System.out.println("Password cannot be blank.");
+                            continue;
                         }
-
-                    } while (password == null || password.isBlank());
-
-                    System.out.println("Registration successful!");
+                        break; // valid password
+                    }
                     userManager.registerUser(username, email, password);
+                    System.out.println("Registration successful!");
 
                 } else if (choice.equals("l")) {
-                    System.out.println("Username: ");
-                    String username = scanner.nextLine();
+                    System.out.println("Username (case-sensitive): ");
+                    String username = scanner.nextLine().trim();
 
-                    System.out.println("Password: ");
-                    String password = scanner.nextLine();
+                    if (username.isEmpty()) {
+                        System.out.println("Username cannot be empty.");
+                        continue; // go back to login menu
+                    }
 
+                    System.out.print("Password: ");
+                    String password = scanner.nextLine().trim();
+
+                    if (password.isEmpty()) {
+                        System.out.println("Password cannot be empty.");
+                        continue;
+                    }
                     currentUser = userManager.loginUser(username, password);
-                    int userId = currentUser.getId();
-                    currentUsersProjects = projectManager.getProjects(userId);
 
                     if (currentUser != null) {
+                        int userId = currentUser.getId();
+                        currentUsersProjects = projectManager.getProjects(userId);
                         System.out.println("Login successful!");
                     } else {
-                        System.out.println("Invalid credentials.");
+                        System.out.println("Invalid credentials. Please try again.");
                     }
 
                 } else if (choice.equals("q")) {
@@ -109,7 +120,7 @@ public class Main {
                 } else {
                     System.out.println("Please choose a valid option.");
                 }
-            } else if (currentProject == null) {
+        } else if (currentProject == null) {
                 while (true) {
                     System.out.println("* * * Project Menu * * *");
                     System.out.println("[C] Create Project");
@@ -123,8 +134,15 @@ public class Main {
                     if (choice.equals("c")) {
                         System.out.print("Project name: ");
                         String name = scanner.nextLine();
+
+
+
                         if (!projectManager.isProjectNameAvailable(currentUser.getId(), name)) {
                             System.out.println("Project name already exists! Please choose another one.");
+
+
+
+
                         } else {
 //
                             Project newProject = projectManager.createProject(currentUser.getId(), name);
@@ -143,12 +161,11 @@ public class Main {
                         } else {
                             System.out.println("* * * My Projects * * *");
                             for (Project p : currentUsersProjects) {
-                                System.out.println("- " + p.getName());
-                                System.out.println("Project: " + p.getName() + " (ID: " + p.getId() + ")");
-                                System.out.println("---------------------");
+//                                System.out.println("- " + p.getName());
+                                System.out.println("Project #"  + p.getId()  + ": " + p.getName());
                             }
 
-                            System.out.println("Please select a project to work on: ");
+                            System.out.println("To select a project, type the title below: ");
                             String name = scanner.nextLine().trim().toLowerCase();
                             for (Project p : currentUsersProjects) {
                                 if (p.getName().equalsIgnoreCase(name)) {
@@ -164,8 +181,7 @@ public class Main {
                                 //task menu
 
                                 while (true) {
-                                    System.out.println(currentProject.getName() + " uncompleted tasks: ");
-                                    System.out.println(taskManager.getTasks(currentProject.getId(), false));
+                                    System.out.println("* * * Task Menu * * *");
                                     System.out.println("[A]dd a task");
                                     System.out.println("[L]ist all tasks");
                                     System.out.println("[M]ark a task as complete");
@@ -180,63 +196,123 @@ public class Main {
                                     } else if (input.equals("b")) {
                                         break;
                                     } else if (input.equals("a")) {
-                                            System.out.println("Enter your task title below: ");
-                                            String title = scanner.nextLine();
 
-                                            if (title.trim().isEmpty()) {
-                                                System.out.println("Task title cannot be empty.");
-                                            } else if (!taskManager.isTitleAvailable(currentProject.getId(), title)) {
-                                                System.out.println("Task name already exists! Please choose another one.");
-                                            } else {
-                                                System.out.println("Enter task description:");
-                                                String description = scanner.nextLine();
-                                                taskManager.addTask(currentProject.getId(), title, description);//
-                                                System.out.println(title + " added to Task Manager!");
+                                        while (true) {
+
+                                            System.out.println("Enter your task title below (or type 'back' to return):");
+                                            String title = scanner.nextLine().trim();
+
+                                            if (title.equalsIgnoreCase("back")) {
+                                                break;
                                             }
+
+                                            if (title.isEmpty()) {
+                                                System.out.println("Task title cannot be empty.");
+                                                continue;
+                                            }
+
+                                            if (!taskManager.isTitleAvailable(currentProject.getId(), title)) {
+                                                System.out.println("Task name already exists! Please choose another one.");
+                                                continue;
+                                            }
+
+                                            while (true) {
+                                                System.out.println("Enter task description (optional, or type 'back' to cancel):");
+                                                String description = scanner.nextLine().trim();
+
+                                                if (description.equalsIgnoreCase("back")) {
+                                                    break; // cancel task creation
+                                                }
+
+                                                // Optional: if empty, just store as empty string
+                                                taskManager.addTask(currentProject.getId(), title, description);
+                                                System.out.println(title + " added to Task Manager!");
+                                                break; // exit loop after adding
+                                            }
+
+                                            break;
+                                        }
 
                                     } else if (input.equals("l")) {
-                                        taskManager.getTasks(currentProject.getId(), false);
-                                        //CHECK ME
-                                    } else if (input.equals("m")) {
-                                        System.out.println("Enter your task title below: ");
-                                        String input2 = scanner.nextLine();
-                                        if (input2.trim().isEmpty()) {
-                                            System.out.println("Task title cannot be empty.");
+                                        List<Task> tasks = taskManager.getTasks(currentProject.getId(), false);
+                                        if (tasks.isEmpty()) {
+                                            System.out.println(("No tasks yet!"));
                                         } else {
+                                            System.out.println("Tasks: ");
+                                            int i = 1;
+                                            for (Task task : tasks) {
+                                                System.out.println(i + "." + task.getTitle() + " - " + task.getDescription());
+                                                i++;
+                                            }
+                                        }
+                                    } else if (input.equals("m")) {
+
+                                        while (true) {
+                                            System.out.println("Enter your task title below (or type 'back' to return):");
+                                            String input2 = scanner.nextLine().trim();
+
+                                            if (input2.equalsIgnoreCase("back")) {
+                                                break; // return to task menu
+                                            }
+
+                                            if (input2.isEmpty()) {
+                                                System.out.println("Task title cannot be empty.");
+                                                continue;
+                                            }
 
                                             Task task = taskManager.getTaskByTitle(currentProject.getId(), input2);
+
                                             if (task == null) {
                                                 System.out.println("Task not found.");
-                                            } else {
-                                                taskManager.markComplete(currentProject.getId(), input2);
-                                                System.out.println("Task marked as completed!");
+                                                continue;
                                             }
-                                        }
 
+                                            taskManager.markComplete(currentProject.getId(), input2);
+                                            System.out.println("Task marked as completed!");
+                                            break; // exit loop after success
+                                        }
                                     } else if (input.equals("r")) {
-                                        System.out.println("Enter your task title below: ");
-                                        String input3 = scanner.nextLine();
+                                            while (true) {
+                                                System.out.println("Enter your task title below (or type 'back' to cancel):");
+                                                String input3 = scanner.nextLine().trim();
 
-                                        if (input3.trim().isEmpty()) {
-                                            System.out.println("Task title cannot be empty.");
-                                        } else {
-                                            Task task = taskManager.getTaskByTitle(currentProject.getId(), input3);
-                                            if (task == null) {
-                                                System.out.println("Task not found.");
-                                            } else {
-                                                System.out.println("Are you sure you want to delete this task? Select [Y] or [N].");
-
-                                                String input4 = scanner.nextLine();
-                                                if (input4.equalsIgnoreCase("y")) {
-                                                    taskManager.removeTask(currentProject.getId(), input3);
-                                                    System.out.println("Task removed.");
-                                                } else if (input4.equalsIgnoreCase("n")) {
-                                                    System.out.println("Task not removed.");
-                                                } else {
-                                                    System.out.println("Invalid option.");
+                                                if (input3.equalsIgnoreCase("back")) {
+                                                    break;
                                                 }
+
+                                                if (input3.isEmpty()) {
+                                                    System.out.println("Task title cannot be empty.");
+                                                    continue;
+                                                }
+
+                                                Task task = taskManager.getTaskByTitle(currentProject.getId(), input3);
+
+                                                if (task == null) {
+                                                    System.out.println("Task not found.");
+                                                    continue;
+                                                }
+
+                                                // Confirmation loop
+                                                while (true) {
+                                                    System.out.println("Are you sure you want to delete this task? Select [Y] or [N].");
+                                                    String input4 = scanner.nextLine().trim();
+
+                                                    if (input4.equalsIgnoreCase("y")) {
+                                                        taskManager.removeTask(currentProject.getId(), input3);
+                                                        System.out.println("Task removed.");
+                                                        break;
+                                                    }
+                                                    else if (input4.equalsIgnoreCase("n")) {
+                                                        System.out.println("Task not removed.");
+                                                        break;
+                                                    }
+                                                    else {
+                                                        System.out.println("Invalid option.");
+                                                    }
+                                                }
+
+                                                break; // main loop exit
                                             }
-                                        }
 
                                     } else {
                                         System.out.println("Please choose a valid option.");
